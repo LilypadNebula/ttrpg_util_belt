@@ -10,7 +10,7 @@ const Header = ({ siteTitle }) => (
           {siteTitle}
         </Link>
       </h1>
-      <h2>
+      <h2 className="flex flex-col md:flex-row justify-between items-center">
         <Link
           className="no-underline mx-2 text-white"
           style={{ transition: '.5s color' }}
@@ -26,6 +26,22 @@ const Header = ({ siteTitle }) => (
           to="/npc/"
         >
           NPC
+        </Link>
+        <Link
+          activeStyle={{ color: 'black' }}
+          className="no-underline mx-2 text-white"
+          style={{ transition: '.5s color' }}
+          to="/calendar/"
+        >
+          Calendar
+        </Link>
+        <Link
+          activeStyle={{ color: 'black' }}
+          className="no-underline mx-2 text-white"
+          style={{ transition: '.5s color' }}
+          to="/spinner/"
+        >
+          Spinner
         </Link>
       </h2>
     </div>
