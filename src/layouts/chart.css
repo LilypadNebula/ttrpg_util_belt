@@ -1,0 +1,10 @@
+.ct-series .ct-slice-pie {
+  fill: white;
+  stroke: black;
+  stroke-width: 4px;
+}
+
+.ct-label {
+  fill: black;
+  font-size: 4rem;
+}

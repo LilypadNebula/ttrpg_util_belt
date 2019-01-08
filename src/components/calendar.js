@@ -1,6 +1,7 @@
 import React from 'react'
 import { range, delay } from 'lodash'
 import posed from 'react-pose'
+import NewCalModal from './newCalModal'
 
 const FadeDiv = posed.div({
   in: { opacity: 1, transition: { duration: 500 } },
@@ -35,10 +36,6 @@ class Calendar extends React.Component {
     currentEventList: [{ name: 'New Years Day', month: 'January', day: 1 }],
     selectedMonthIndex: 0,
     changing: false,
-    newCalMonthName: '',
-    newCalMonthDays: '',
-    newCalStartAt: 2,
-    newCalMonths: [],
   }
 
   changeMonth = async index => {
@@ -48,19 +45,6 @@ class Calendar extends React.Component {
       () => this.setState({ changing: false, selectedMonthIndex: index }),
       700
     )
-  }
-
-  addNewCalMonth = () => {
-    const newMonths = this.state.newCalMonths.concat({
-      name: this.state.newCalMonthName,
-      days: this.state.newCalMonthDays,
-      id: Math.floor(Math.random() * Math.random() * 1000),
-    })
-    this.setState({
-      newCalMonths: newMonths,
-      newCalMonthName: '',
-      newCalMonthDays: '',
-    })
   }
 
   createCal = () => {
@@ -81,19 +65,10 @@ class Calendar extends React.Component {
     )
   }
 
-  shiftNewMonths = result => {
-    if (!result.destination) {
-      return
-    }
-    const newMonths = Array.from(this.state.newCalMonths)
-    const [toMove] = newMonths.splice(result.source.index, 1)
-    newMonths.splice(result.destination.index, 0, toMove)
-    this.setState({ newCalMonths: newMonths })
-  }
-
   render() {
     return (
       <div className="flex flex-col font-sans">
+        <NewCalModal />
         <div>
           {this.state.currentMonths.map((month, index) => (
             <button

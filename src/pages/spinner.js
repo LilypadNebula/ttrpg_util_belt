@@ -2,18 +2,50 @@ import React, { Component } from 'react'
 import { styler, decay, listen, pointer, value } from 'popmotion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLongArrowAltUp } from '@fortawesome/free-solid-svg-icons'
+import { range } from 'lodash'
+import 'chartist/dist/chartist.min.css'
+import '../layouts/chart.css'
+
+const Chartist = require('chartist')
 
 //Variable to hold document listener, to unsubscribe in componentWillUnmount
 let subscriber = null
 
 class SpinnerPage extends Component {
   spinRef = React.createRef()
-  pageRef = React.createRef()
+  chartRef = React.createRef()
   state = {
     result: 'Not spun',
+    newVal: '',
+    seriesLength: 8,
+    chart: null,
+  }
+  newSpinnerValue = () => {
+    if (this.state.newVal > 15) return
+    const length = range(this.state.newVal)
+    const newData = { series: [], labels: [] }
+    length.forEach(e => {
+      newData.series.push(1)
+      newData.labels.push(e + 1)
+    })
+    this.setState({ seriesLength: newData.series.length })
+    this.state.chart.update(newData)
   }
 
   componentDidMount() {
+    this.setState({
+      chart: new Chartist.Pie(
+        this.chartRef.current,
+        {
+          series: [1, 1, 1, 1, 1, 1, 1, 1],
+          labels: ['1', '2', '3', '4', '5', '6', '7', '8'],
+        },
+        {
+          labelOffset: 30,
+        }
+      ),
+    })
+
     const spinStyler = styler(this.spinRef.current)
     const rotation = value(0, spinStyler.set('rotate'))
 
@@ -24,11 +56,18 @@ class SpinnerPage extends Component {
     })
 
     subscriber = listen(document, 'mouseup touchend').start(() => {
-      this.setState({ result: 'Spinning' })
+      if (rotation.getVelocity() !== 0) this.setState({ result: 'Spinning!' })
       rotation.subscribe({
         update: v => {},
-        complete: () =>
-          this.setState({ result: Math.ceil(rotation.get() / 90) }),
+        complete: () => {
+          if (rotation.get() !== 0) {
+            this.setState({
+              result: Math.ceil(
+                rotation.get() / (360 / this.state.seriesLength)
+              ),
+            })
+          }
+        },
       })
       decay({
         from: rotation.get(),
@@ -53,43 +92,34 @@ class SpinnerPage extends Component {
   }
   render() {
     return (
-      <div
-        className="flex justify-center items-center flex-col"
-        ref={this.pageRef}
-      >
-        <div className="rounded-full border-4 border-black relative flex flex-wrap h-80 w-80 md:w-realBig md:h-realBig">
+      <div className="w-full">
+        <div className="w-full md:w-1/2 mx-auto flex justify-center items-center">
           <div
             ref={this.spinRef}
-            className="absolute pin flex justify-center items-center md:text-2xl"
+            className="text-sm md:text-2xl absolute z-50 text-purple-dark"
           >
             <FontAwesomeIcon icon={faLongArrowAltUp} size="10x" />
           </div>
           <div
-            className="rounded-tl-full border-r border-b border-black flex justify-center items-center"
-            style={{ height: '50%', width: '50%' }}
-          >
-            4
-          </div>
-          <div
-            className="rounded-tr-full border-b border-black flex justify-center items-center"
-            style={{ height: '50%', width: '50%' }}
-          >
-            1
-          </div>
-          <div
-            className="rounded-bl-full border-r border-black flex justify-center items-center"
-            style={{ height: '50%', width: '50%' }}
-          >
-            3
-          </div>
-          <div
-            className="rounded-br-full flex justify-center items-center"
-            style={{ height: '50%', width: '50%' }}
-          >
-            2
-          </div>
+            ref={this.chartRef}
+            className="ct-chart ct-perfect-fifth flex justify-center items-center"
+          />
         </div>
-        <p className="my-8 text-5xl md:text-realBig">{this.state.result}</p>
+        <div className="flex flex-col items-center">
+          <p className="my-8 text-5xl md:text-realBig">{this.state.result}</p>
+          <input
+            type="number"
+            className="p-2 border-black rounded border text-2xl"
+            value={this.state.newVal}
+            onChange={e => this.setState({ newVal: e.target.value })}
+          />
+          <button
+            className="bg-purple-light rounded p-4 text-2xl text-white my-4"
+            onClick={this.newSpinnerValue}
+          >
+            Set Spinner
+          </button>
+        </div>
       </div>
     )
   }

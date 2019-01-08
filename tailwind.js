@@ -86,6 +86,8 @@ let colors = {
   'red-light': '#ef5753',
   'red-lighter': '#f9acaa',
   'red-lightest': '#fcebea',
+
+  shade: 'rgb(0,0,0,.7)',
 }
 
 module.exports = {

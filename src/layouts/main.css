@@ -40,11 +40,6 @@
   @apply text-black;
 }
 
-html,
-body {
-  @apply overflow-x-hidden;
-}
-
 /**
   * This injects all of Tailwind's utility classes, generated based on your
   * config file.
