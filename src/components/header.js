@@ -31,14 +31,6 @@ const Header = ({ siteTitle }) => (
           activeStyle={{ color: 'black' }}
           className="no-underline mx-2 text-white"
           style={{ transition: '.5s color' }}
-          to="/calendar/"
-        >
-          Calendar
-        </Link>
-        <Link
-          activeStyle={{ color: 'black' }}
-          className="no-underline mx-2 text-white"
-          style={{ transition: '.5s color' }}
           to="/spinner/"
         >
           Spinner

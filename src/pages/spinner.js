@@ -6,10 +6,10 @@ import { range } from 'lodash'
 import 'chartist/dist/chartist.min.css'
 import '../layouts/chart.css'
 
-const Chartist = require('chartist')
-
 //Variable to hold document listener, to unsubscribe in componentWillUnmount
-let subscriber = null
+let spinStart
+let spinEnd
+let decayer
 
 class SpinnerPage extends Component {
   spinRef = React.createRef()
@@ -33,6 +33,7 @@ class SpinnerPage extends Component {
   }
 
   componentDidMount() {
+    const Chartist = require('chartist')
     this.setState({
       chart: new Chartist.Pie(
         this.chartRef.current,
@@ -49,13 +50,15 @@ class SpinnerPage extends Component {
     const spinStyler = styler(this.spinRef.current)
     const rotation = value(0, spinStyler.set('rotate'))
 
-    listen(this.spinRef.current, 'mousedown touchstart').start(() => {
-      pointer({ x: rotation.get() })
-        .pipe(({ x }) => x)
-        .start(rotation)
-    })
+    spinStart = listen(this.spinRef.current, 'mousedown touchstart').start(
+      () => {
+        pointer({ x: rotation.get() })
+          .pipe(({ x }) => x)
+          .start(rotation)
+      }
+    )
 
-    subscriber = listen(document, 'mouseup touchend').start(() => {
+    spinEnd = listen(document, 'mouseup touchend').start(() => {
       if (rotation.getVelocity() !== 0) this.setState({ result: 'Spinning!' })
       rotation.subscribe({
         update: v => {},
@@ -69,7 +72,7 @@ class SpinnerPage extends Component {
           }
         },
       })
-      decay({
+      decayer = decay({
         from: rotation.get(),
         velocity: rotation.getVelocity(),
         timeConstant: 700,
@@ -88,7 +91,9 @@ class SpinnerPage extends Component {
     })
   }
   componentWillUnmount() {
-    subscriber.stop()
+    spinStart.stop()
+    spinEnd.stop()
+    decayer.stop()
   }
   render() {
     return (
